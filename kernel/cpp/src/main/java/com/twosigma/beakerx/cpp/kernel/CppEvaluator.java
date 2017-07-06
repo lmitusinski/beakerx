@@ -58,8 +58,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Semaphore;
 
 import static com.twosigma.beakerx.kernel.Utils.uuid;
 
@@ -74,7 +72,6 @@ public class CppEvaluator extends BaseEvaluator {
   private List<String> userFlags = new ArrayList<>();
   private Process cellProc;
   private TempCppFiles tempCppFiles;
-  private final ConcurrentLinkedQueue<jobDescriptor> jobQueue = new ConcurrentLinkedQueue<jobDescriptor>();
   private HashSet<String> loadedCells;
 
 
@@ -137,13 +134,6 @@ public class CppEvaluator extends BaseEvaluator {
     return false;
   }
 
-  @Override
-  public void evaluate(SimpleEvaluationObject seo, String code) {
-    // send job to thread
-    jobQueue.add(new jobDescriptor(seo, code, uuid()));
-    syncObject.release();
-  }
-
   protected class workerThread extends Thread {
 
     public workerThread() {
@@ -154,7 +144,7 @@ public class CppEvaluator extends BaseEvaluator {
      */
 
     public void run() {
-      jobDescriptor j = null;
+      JobDescriptor j = null;
       NamespaceClient nc = null;
 
 
@@ -408,15 +398,4 @@ public class CppEvaluator extends BaseEvaluator {
     }
   }
 
-  protected class jobDescriptor {
-    private SimpleEvaluationObject outputObject;
-    private String codeToBeExecuted;
-    private String cellId;
-
-    jobDescriptor(SimpleEvaluationObject o, String c, String cid) {
-      outputObject = o;
-      codeToBeExecuted = c;
-      cellId = cid;
-    }
-  }
 }

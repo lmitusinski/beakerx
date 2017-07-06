@@ -56,7 +56,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.twosigma.beakerx.DefaultJVMVariables.CLASSPATH;
 import static com.twosigma.beakerx.DefaultJVMVariables.IMPORTS;
@@ -70,17 +69,6 @@ public class KotlinEvaluator extends BaseEvaluator {
   protected ClasspathScanner cps;
   protected boolean updateLoader;
   protected workerThread myWorker;
-  protected final ConcurrentLinkedQueue<jobDescriptor> jobQueue = new ConcurrentLinkedQueue<jobDescriptor>();
-  
-  protected class jobDescriptor {
-    String codeToBeExecuted;
-    SimpleEvaluationObject outputObject;
-
-    jobDescriptor(String c, SimpleEvaluationObject o) {
-      codeToBeExecuted = c;
-      outputObject = o;
-    }
-  }
 
   public KotlinEvaluator(String id, String sId) {
     this(id, sId, new BeakerCellExecutor("kotlin"));
@@ -156,14 +144,6 @@ public class KotlinEvaluator extends BaseEvaluator {
     return classPath.add(path);
   }
 
-
-  @Override
-  public void evaluate(SimpleEvaluationObject seo, String code) {
-    // send job to thread
-    jobQueue.add(new jobDescriptor(code, seo));
-    syncObject.release();
-  }
-
   @Override
   public AutocompleteResult autocomplete(String code, int caretPosition) {
     List<String> ret = new ArrayList<>();
@@ -183,7 +163,7 @@ public class KotlinEvaluator extends BaseEvaluator {
 
     public void run() {
       DynamicClassLoaderSimple loader = null;
-      jobDescriptor j = null;
+      JobDescriptor j = null;
 
       NamespaceClient nc = null;
 

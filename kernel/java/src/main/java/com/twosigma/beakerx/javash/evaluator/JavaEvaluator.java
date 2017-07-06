@@ -43,7 +43,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,17 +57,6 @@ public class JavaEvaluator extends BaseEvaluator {
   protected JavaAutocomplete jac;
   protected boolean updateLoader;
   protected workerThread myWorker;
-  protected final ConcurrentLinkedQueue<jobDescriptor> jobQueue = new ConcurrentLinkedQueue<jobDescriptor>();
-
-  protected class jobDescriptor {
-    String codeToBeExecuted;
-    SimpleEvaluationObject outputObject;
-
-    jobDescriptor(String c, SimpleEvaluationObject o) {
-      codeToBeExecuted = c;
-      outputObject = o;
-    }
-  }
 
   public JavaEvaluator(String id, String sId) {
     this(id, sId, new BeakerCellExecutor("javash"));
@@ -153,13 +141,6 @@ public class JavaEvaluator extends BaseEvaluator {
   }
 
   @Override
-  public void evaluate(SimpleEvaluationObject seo, String code) {
-    // send job to thread
-    jobQueue.add(new jobDescriptor(code, seo));
-    syncObject.release();
-  }
-
-  @Override
   public AutocompleteResult autocomplete(String code, int caretPosition) {
     List<String> ret = jac.doAutocomplete(code, caretPosition);
 
@@ -207,7 +188,7 @@ public class JavaEvaluator extends BaseEvaluator {
 
     public void run() {
       DynamicClassLoaderSimple loader = null;
-      jobDescriptor j = null;
+      JobDescriptor j = null;
       org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler javaSourceCompiler;
 
       javaSourceCompiler = new JavaSourceCompiler();

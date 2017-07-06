@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SQLEvaluator extends BaseEvaluator {
 
@@ -53,10 +52,8 @@ public class SQLEvaluator extends BaseEvaluator {
 
   private Map<String, ConnectionStringHolder> namedConnectionString = new HashMap<>();
   private ConnectionStringHolder defaultConnectionString;
-
   private ClasspathScanner cps;
   private SQLAutocomplete sac;
-  private final ConcurrentLinkedQueue<JobDescriptor> jobQueue = new ConcurrentLinkedQueue<>();
   private final QueryExecutor queryExecutor;
   private final JDBCClient jdbcClient;
 
@@ -72,11 +69,6 @@ public class SQLEvaluator extends BaseEvaluator {
     executor = cellExecutor;
     queryExecutor = new QueryExecutor(jdbcClient);
     startWorker();
-  }
-
-  public void evaluate(SimpleEvaluationObject seo, String code) {
-    jobQueue.add(new JobDescriptor(code, seo));
-    syncObject.release();
   }
 
   private void startWorker() {
@@ -109,33 +101,6 @@ public class SQLEvaluator extends BaseEvaluator {
     return sac.doAutocomplete(code, caretPosition);
   }
 
-  private class JobDescriptor {
-    private String code;
-
-    private SimpleEvaluationObject simpleEvaluationObject;
-
-    private JobDescriptor(String code, SimpleEvaluationObject seo) {
-      this.code = code;
-      simpleEvaluationObject = seo;
-    }
-
-    public String getCode() {
-      return code;
-    }
-
-    public void setCode(String code) {
-      this.code = code;
-    }
-
-    private SimpleEvaluationObject getSimpleEvaluationObject() {
-      return simpleEvaluationObject;
-    }
-
-    public void setSimpleEvaluationObject(SimpleEvaluationObject simpleEvaluationObject) {
-      this.simpleEvaluationObject = simpleEvaluationObject;
-    }
-  }
-
   private class WorkerThread extends Thread {
 
     private WorkerThread() {
@@ -161,20 +126,20 @@ public class SQLEvaluator extends BaseEvaluator {
         }
 
         job = jobQueue.poll();
-        job.getSimpleEvaluationObject().started();
+        job.outputObject.started();
 
-        job.getSimpleEvaluationObject().setOutputHandler();
+        job.outputObject.setOutputHandler();
         namespaceClient = NamespaceClient.getBeaker(sessionId);
-        namespaceClient.setOutputObj(job.getSimpleEvaluationObject());
+        namespaceClient.setOutputObj(job.outputObject);
 
-        executor.executeTask(new MyRunnable(job.getSimpleEvaluationObject(), namespaceClient));
+        executor.executeTask(new MyRunnable(job.outputObject, namespaceClient));
 
-        job.getSimpleEvaluationObject().clrOutputHandler();
+        job.outputObject.clrOutputHandler();
 
         namespaceClient.setOutputObj(null);
         namespaceClient = null;
-        if (job != null && job.getSimpleEvaluationObject() != null) {
-          job.getSimpleEvaluationObject().executeCodeCallback();
+        if (job != null && job.outputObject != null) {
+          job.outputObject.executeCodeCallback();
         }
       }
     }

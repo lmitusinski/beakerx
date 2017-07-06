@@ -15,6 +15,8 @@
  */
 package com.twosigma.beakerx.evaluator;
 
+import com.twosigma.beakerx.evaluator.BaseEvaluator.JobDescriptor;
+import com.twosigma.beakerx.jvm.object.SimpleEvaluationObject;
 import com.twosigma.beakerx.jvm.threads.CellExecutor;
 import com.twosigma.beakerx.kernel.Classpath;
 import com.twosigma.beakerx.kernel.ImportPath;
@@ -23,9 +25,27 @@ import com.twosigma.beakerx.kernel.KernelParameters;
 import com.twosigma.beakerx.kernel.PathToJar;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 
 public abstract class BaseEvaluator implements Evaluator {
+  
+  protected class JobDescriptor {
+    
+    public String codeToBeExecuted;
+    public SimpleEvaluationObject outputObject;
+    public String cellId;
+
+    public JobDescriptor(String c, SimpleEvaluationObject o) {
+      codeToBeExecuted = c;
+      outputObject = o;
+    }
+    
+    JobDescriptor(SimpleEvaluationObject o, String c, String cid) {
+      this(c, o);
+      cellId = cid;
+    }
+  }
   
   protected Classpath classPath;
   protected Imports imports;
@@ -33,6 +53,7 @@ public abstract class BaseEvaluator implements Evaluator {
   protected final String sessionId;
   protected volatile boolean exit;
   protected final Semaphore syncObject = new Semaphore(0, true);
+  protected final ConcurrentLinkedQueue<JobDescriptor> jobQueue = new ConcurrentLinkedQueue<JobDescriptor>();
   protected CellExecutor executor;
   
   public BaseEvaluator(String id, String sId) {
@@ -44,6 +65,12 @@ public abstract class BaseEvaluator implements Evaluator {
   }
   
   protected abstract boolean addJar(PathToJar path);
+  
+  public void evaluate(SimpleEvaluationObject seo, String code) {
+    // send job to thread
+    jobQueue.add(new JobDescriptor(code, seo));
+    syncObject.release();
+  }
   
   public void killAllThreads() {
     executor.killAllThreads();

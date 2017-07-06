@@ -50,7 +50,6 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,23 +68,9 @@ public class GroovyEvaluator extends BaseEvaluator {
   protected GroovyClasspathScanner cps;
   protected boolean updateLoader;
   protected GroovyAutocomplete gac;
-  protected final ConcurrentLinkedQueue<jobDescriptor> jobQueue = new ConcurrentLinkedQueue<jobDescriptor>();
-
   public static boolean LOCAL_DEV = false;
-
   public static String GROOVY_JAR_PATH = "GROOVY_JAR_PATH";
-
   private Binding scriptBinding = null;
-
-  protected class jobDescriptor {
-    public String codeToBeExecuted;
-    public SimpleEvaluationObject outputObject;
-
-    jobDescriptor(String c, SimpleEvaluationObject o) {
-      codeToBeExecuted = c;
-      outputObject = o;
-    }
-  }
 
   protected static Pattern[] envVariablePatterns = {
           Pattern.compile("\\$\\{([a-z_][a-z0-9_]*)\\}", Pattern.CASE_INSENSITIVE),
@@ -274,12 +259,6 @@ public class GroovyEvaluator extends BaseEvaluator {
     return p;
   }
 
-  public void evaluate(SimpleEvaluationObject seo, String code) {
-    // send job to thread
-    jobQueue.add(new jobDescriptor(code, seo));
-    syncObject.release();
-  }
-
   public AutocompleteResult autocomplete(String code, int caretPosition) {
     return gac.doAutocomplete(code, caretPosition, loader);
   }
@@ -302,7 +281,7 @@ public class GroovyEvaluator extends BaseEvaluator {
      */
 
     public void run() {
-      jobDescriptor j = null;
+      JobDescriptor j = null;
       NamespaceClient nc = null;
 
       while (!exit) {

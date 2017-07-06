@@ -77,17 +77,6 @@ public class ScalaEvaluator extends BaseEvaluator {
   protected String currentClassPath;
   protected String currentImports;
   private final Provider<BeakerObjectConverter> objectSerializerProvider;
-  protected final ConcurrentLinkedQueue<jobDescriptor> jobQueue = new ConcurrentLinkedQueue<jobDescriptor>();
-  
-  protected class jobDescriptor {
-    String codeToBeExecuted;
-    SimpleEvaluationObject outputObject;
-
-    jobDescriptor(String c, SimpleEvaluationObject o) {
-      codeToBeExecuted = c;
-      outputObject = o;
-    }
-  }
 
   public ScalaEvaluator(String id, String sId, Provider<BeakerObjectConverter> osp) {
     this(id, sId, osp, new BeakerCellExecutor("scala"), new BeakerxObjectFactoryImpl());
@@ -180,13 +169,6 @@ public class ScalaEvaluator extends BaseEvaluator {
   }
 
   @Override
-  public void evaluate(SimpleEvaluationObject seo, String code) {
-    // send job to thread
-    jobQueue.add(new jobDescriptor(code, seo));
-    syncObject.release();
-  }
-
-  @Override
   public AutocompleteResult autocomplete(String code, int caretPosition) {
     if (acshell != null) {
       int lineStart = 0;
@@ -221,7 +203,7 @@ public class ScalaEvaluator extends BaseEvaluator {
      */
 
     public void run() {
-      jobDescriptor j = null;
+      JobDescriptor j = null;
       NamespaceClient nc = null;
 
       while (!exit) {

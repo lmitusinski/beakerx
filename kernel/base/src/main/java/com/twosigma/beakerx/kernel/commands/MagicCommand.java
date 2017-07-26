@@ -73,6 +73,7 @@ public class MagicCommand {
   public static final String CLASSPATH_REMOVE = CLASSPATH + " remove";
   public static final String CLASSPATH_SHOW = CLASSPATH;
   public static final String ADD_IMPORT = "%import";
+  public static final String ADD_STATIC_IMPORT = ADD_IMPORT + " static";
   public static final String UNIMPORT = "%unimport";
 
   private Map<String, MagicCommandFunctionality> commands = new LinkedHashMap<>();
@@ -111,6 +112,7 @@ public class MagicCommand {
     commands.put(CLASSPATH_ADD_JAR, classpathAddJar());
     commands.put(CLASSPATH_REMOVE, classpathRemove());
     commands.put(CLASSPATH_SHOW, classpathShow());
+    commands.put(ADD_STATIC_IMPORT, addStaticImport());
     commands.put(ADD_IMPORT, addImport());
     commands.put(UNIMPORT, unimport());
     commands.put(DATASOURCES, dataSources());
@@ -142,9 +144,21 @@ public class MagicCommand {
     return (code, command, message, executionCount) -> {
       String[] parts = command.split(" ");
       if (parts.length != 2) {
-        throw new RuntimeException("Wrong import format.");
+        sendErrorMessage(message, "Wrong import format.", executionCount);
       }
       this.kernel.addImport(new ImportPath(parts[1]));
+      return getMagicCommandItem(code, message, executionCount);
+    };
+  }
+
+  private MagicCommandFunctionality addStaticImport() {
+    return (code, command, message, executionCount) -> {
+      String[] parts = command.split(" ");
+      if (parts.length != 3) {
+        sendErrorMessage(message, "Wrong import static format.", executionCount);
+      }
+
+      this.kernel.addImport(new ImportPath(parts[1] + " " + parts[2]));
       return getMagicCommandItem(code, message, executionCount);
     };
   }
@@ -153,7 +167,7 @@ public class MagicCommand {
     return (code, command, message, executionCount) -> {
       String[] parts = command.split(" ");
       if (parts.length != 2) {
-        throw new RuntimeException("Wrong import format.");
+        sendErrorMessage(message, "Wrong import format.", executionCount);
       }
       this.kernel.removeImport(new ImportPath(parts[1]));
       return getMagicCommandItem(code, message, executionCount);
@@ -194,6 +208,14 @@ public class MagicCommand {
       String path = split[3];
       return getMagicCommandItem(addJars(path), code, message, executionCount);
     };
+  }
+
+  private MagicCommandItem sendErrorMessage(Message message, String messageText, int executionCount) {
+    return new MagicCommandItemWithResult(
+        messageCreator
+            .buildOutputMessage(message, messageText, true),
+        messageCreator.buildReplyWithoutStatus(message, executionCount)
+    );
   }
 
   private Collection<String> addJars(String path) {

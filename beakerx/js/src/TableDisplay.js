@@ -59,6 +59,13 @@ var TableDisplayView = widgets.DOMWidgetView.extend({
           that._currentScope && that._currentScope.adjustRedraw();
       });
     });
+
+    this.on('remove', function() {
+      if (that._currentScope) {
+        that._currentScope.doDestroy(true);
+        that._currentScope = null;
+      }
+    });
   },
 
   update: function() {

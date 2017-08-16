@@ -44,8 +44,7 @@ Using [pip](https://pypi.python.org/pypi/pip):
 
 ```
 pip install beakerx
-jupyter nbextension install beakerx --py --sys-prefix
-jupyter nbextension enable beakerx --py --sys-prefix
+python -m beakerx.install
 ```
 
 ## Developer Install
@@ -70,23 +69,20 @@ jupyter nbextension enable beakerx --py --sys-prefix
 The kernels are installed to run out of the repo, so just a build should update the java code.
 
 ```
-(cd beakerx; python setup.py java)
+(cd kernel; ./gradlew build)
 ```
-
-Note this is currently broken and you need to do a complete rebuild
-after a java change. See
-[#5739](https://github.com/twosigma/beakerx/issues/5739).
 
 ### Update after JS change
 
 ```
-(cd beakerx; python setup.py js)
+(cd beakerx/js; yarn install)
 ```
 
 ## Beaker Notebooks Converter
 
+Preexisting Beaker Notebook files can be convereted to Jupyter Notebook files with the following command:
 ```
-(cd beakerx; python -m beakerx.bkr2ipynb *.bkr)
+python -m beakerx.bkr2ipynb *.bkr)
 ```
 
 ## Groovy with Interactive Plotting and Tables:

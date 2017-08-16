@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Post-install configuration for BeakerX.
+"""
+
 import argparse
 import beakerx
 import os
 import shutil
 import subprocess
 import sys
+
+def run(cmd):
+    subprocess.run(cmd, check=True)
 
 def install_kernels(package_dir):
     kernels_dir = os.path.join(package_dir, "static", "kernel")
@@ -38,16 +45,17 @@ def install_kernels(package_dir):
         expanded_spec_file_name = os.path.join(expanded_dir, 'kernel.json')
         with open(expanded_spec_file_name, "w") as expanded_spec_file:
             expanded_spec_file.write(spec_content)
-        install_cmd = ['jupyter', 'kernelspec', 'install', '--sys-prefix',
-                       '--replace', '--name', kernel_name, expanded_dir]
-        subprocess.run(install_cmd, check=True)
+        run(['jupyter', 'kernelspec', 'install', '--sys-prefix',
+             '--replace', '--name', kernel_name, expanded_dir])
     for dir, subdirs, files in os.walk(kernels_dir):
         if 'kernel.json' in files:
             install_kernel(dir)
         else:
             continue
-        
 
+def install_nbextension():
+    run(["jupyter", "nbextension", "install", "beakerx", "--py", "--sys-prefix"])
+    run(["jupyter", "nbextension", "enable", "beakerx", "--py", "--sys-prefix"])
 
 def main():
     parser = argparse.ArgumentParser()
@@ -55,6 +63,8 @@ def main():
                         help="location of the environment to install into")
     args = parser.parse_args()
     install_kernels(os.path.dirname(beakerx.__file__))
+    install_nbextension()
+    # todo: install our kernelspec config using the prefix
 
 if __name__ == "__main__":
     main()

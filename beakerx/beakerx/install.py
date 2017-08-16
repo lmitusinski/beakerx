@@ -64,7 +64,8 @@ def main():
     args = parser.parse_args()
     install_kernels(os.path.dirname(beakerx.__file__))
     install_nbextension()
-    # todo: install our kernelspec config using the prefix
+    # todo: install our kernelspec_manager config using the prefix
+    # todo: copy our custom css
 
 if __name__ == "__main__":
     main()

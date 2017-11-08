@@ -32,23 +32,21 @@ public class ExecutionResultSender implements Observer {
 
   public static Logger logger = LoggerFactory.getLogger(ExecutionResultSender.class);
 
-  private MessageCreator handler;
   private volatile boolean work = true;
   private KernelFunctionality kernel;
 
   public ExecutionResultSender(KernelFunctionality kernel) {
     this.kernel = kernel;
-    handler = new MessageCreator(kernel);
   }
 
   @Override
   public synchronized void update(Observable o, Object arg) {
     SimpleEvaluationObject seo = (SimpleEvaluationObject) o;
     if (seo != null) {
-      Iterator<MessageHolder> iterator = handler.createMessage(seo).iterator();
+      Iterator<MessageHolder> iterator = MessageCreator.createMessage(seo, kernel).iterator();
       while (this.work && iterator.hasNext()) {
         MessageHolder job = iterator.next();
-        if (handler != null && job != null) {
+        if (job != null) {
           if (SocketEnum.IOPUB_SOCKET.equals(job.getSocketType())) {
             kernel.publish(job.getMessage());
           } else if (SocketEnum.SHELL_SOCKET.equals(job.getSocketType())) {

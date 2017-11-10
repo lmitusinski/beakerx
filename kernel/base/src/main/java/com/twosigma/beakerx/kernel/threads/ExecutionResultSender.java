@@ -43,7 +43,7 @@ public class ExecutionResultSender implements Observer {
   public synchronized void update(Observable o, Object arg) {
     SimpleEvaluationObject seo = (SimpleEvaluationObject) o;
     if (seo != null) {
-      Iterator<MessageHolder> iterator = MessageCreator.createMessage(seo, kernel).iterator();
+      Iterator<MessageHolder> iterator = MessageCreator.createMessage(seo).iterator();
       while (this.work && iterator.hasNext()) {
         MessageHolder job = iterator.next();
         if (job != null) {

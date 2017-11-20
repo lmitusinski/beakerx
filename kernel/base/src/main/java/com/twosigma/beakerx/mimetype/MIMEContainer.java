@@ -69,13 +69,13 @@ public class MIMEContainer {
   }
 
   private MIME mime;
-  private Object data = "";
+  private String data = "";
 
   private MIMEContainer(MIME mime) {
     this.mime = mime;
   }
 
-  public MIMEContainer(String mime, Object code) {
+  public MIMEContainer(String mime, String code) {
     this.mime = new MIME(mime);
     this.data = code;
   }
@@ -84,28 +84,28 @@ public class MIMEContainer {
     return mime;
   }
 
-  public Object getData() {
+  public String getData() {
     return data;
   }
 
 
-  public static MIMEContainer JavaScript(Object data) {
+  public static MIMEContainer JavaScript(String data) {
     return addMimeType(MIME.APPLICATION_JAVASCRIPT, data);
   }
 
-  public static MIMEContainer HTML(Object data) {
+  public static MIMEContainer HTML(String data) {
     return addMimeType(MIME.TEXT_HTML, data);
   }
 
-  public static MIMEContainer Latex(Object data) {
+  public static MIMEContainer Latex(String data) {
     return addMimeType(MIME.TEXT_LATEX, data);
   }
 
-  public static MIMEContainer Text(Object data) {
+  public static MIMEContainer Text(String data) {
     return addMimeType(MIME.TEXT_PLAIN, data);
   }
 
-  public static MIMEContainer Markdown(Object data) {
+  public static MIMEContainer Markdown(String data) {
     return addMimeType(MIME.TEXT_MARKDOWN, data);
   }
 
@@ -114,7 +114,7 @@ public class MIMEContainer {
     return addMimeType(MIME.TEXT_LATEX, "$$" + data + "$$");
   }
 
-  public static MIMEContainer Javascript(Object data) {
+  public static MIMEContainer Javascript(String data) {
     return addMimeType(MIME.APPLICATION_JAVASCRIPT, data);
   }
 
@@ -147,8 +147,8 @@ public class MIMEContainer {
     return new MIMEContainer(new MIME(mime));
   }
 
-  protected static MIMEContainer addMimeType(String mime, Object data) {
-    return new MIMEContainer(mime, data.toString());
+  protected static MIMEContainer addMimeType(String mime, String data) {
+    return new MIMEContainer(mime, data);
   }
 
   protected static boolean exists(String data) {

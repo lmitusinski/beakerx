@@ -118,7 +118,7 @@ public class ClasspathMagicCommandTest {
   }
 
   private String classpath(MagicCommandOutcome result) {
-    return result.getItems().get(0).getMIMEContainer().get().getData().toString();
+    return result.getItems().get(0).getMIMEContainer().get().getData();
   }
 
 }

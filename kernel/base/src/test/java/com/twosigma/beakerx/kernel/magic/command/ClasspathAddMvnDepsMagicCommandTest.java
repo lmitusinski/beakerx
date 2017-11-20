@@ -115,7 +115,7 @@ public class ClasspathAddMvnDepsMagicCommandTest {
 
   private String getText(MagicCommandOutcome process) {
     MagicCommandOutcomeItem magicCommandItem = process.getItems().get(0);
-    return (String) magicCommandItem.getMIMEContainer().get().getData();
+    return magicCommandItem.getMIMEContainer().get().getData();
   }
 
   private static void prepareLocalMavenRepository() throws IOException {

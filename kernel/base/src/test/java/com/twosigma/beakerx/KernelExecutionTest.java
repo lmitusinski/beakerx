@@ -95,7 +95,7 @@ public abstract class KernelExecutionTest extends KernelSetUpFixtureTest {
   }
 
   private String getText(MIMEContainer message) {
-    return (String) message.getData();
+    return message.getData();
   }
 
   private void loadMagicCommandByClass() {

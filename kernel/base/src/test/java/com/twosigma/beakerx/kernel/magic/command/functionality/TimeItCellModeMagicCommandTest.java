@@ -62,6 +62,6 @@ public class TimeItCellModeMagicCommandTest {
   }
 
   private String getText(MIMEContainer message) {
-    return (String) message.getData();
+    return message.getData();
   }
 }

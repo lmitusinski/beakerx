@@ -48,7 +48,7 @@ public class JavaScriptMagicCommandTest {
     //when
     MagicCommandOutcome result = executeMagicCommands(code, 1, kernel);
     //then
-    String toCompare = (String) result.getItems().get(0).getMIMEContainer().get().getData();
+    String toCompare = result.getItems().get(0).getMIMEContainer().get().getData();
 
     toCompare = toCompare.replaceAll("\\s+", "");
     jsCode = jsCode.replaceAll("\\s+", "");

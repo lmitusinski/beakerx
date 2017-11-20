@@ -90,7 +90,7 @@ public class ImportMagicCommandTest {
     Optional<MIMEContainer> result = process.getItems().get(0).getMIMEContainer();
     assertThat(result.isPresent()).isTrue();
     result.ifPresent(r -> {
-      String content = (String)r.getData();
+      String content = r.getData();
       assertThat(content.equals("Wrong import format."));
     });
   }

@@ -20,6 +20,7 @@ import com.twosigma.beakerx.kernel.magic.command.MagicCommandFunctionality;
 import com.twosigma.beakerx.kernel.magic.command.outcome.MagicCommandOutcomeItem;
 import com.twosigma.beakerx.kernel.magic.command.outcome.MagicCommandOutput;
 import com.twosigma.beakerx.mimetype.MIMEContainer;
+
 import static com.twosigma.beakerx.mimetype.MIMEContainer.Text;
 
 public class ShowEvnsCustomMagicCommand implements MagicCommandFunctionality {
@@ -31,8 +32,8 @@ public class ShowEvnsCustomMagicCommand implements MagicCommandFunctionality {
 
   @Override
   public MagicCommandOutcomeItem execute(MagicCommandExecutionParam param) {
-    MIMEContainer result = Text(System.getenv());
-    return new MagicCommandOutput(MagicCommandOutcomeItem.Status.OK,result.getData().toString());
+    MIMEContainer mimeContainer = Text(System.getenv().toString());
+    return new MagicCommandOutput(MagicCommandOutcomeItem.Status.OK, mimeContainer.getData());
   }
 
 }

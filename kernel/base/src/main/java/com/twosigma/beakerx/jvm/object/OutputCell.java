@@ -25,6 +25,6 @@ public class OutputCell {
   public static final MIMEContainer HIDDEN = MIMEContainer.HIDDEN;
 
   public static Map<String, String> DISPLAYER_HIDDEN = new HashMap<String, String>() {{
-    put(OutputCell.HIDDEN.getMime().asString(), MIMEContainer.HIDDEN.getData().toString());
+    put(OutputCell.HIDDEN.getMime().asString(), MIMEContainer.HIDDEN.getData());
   }};
 }

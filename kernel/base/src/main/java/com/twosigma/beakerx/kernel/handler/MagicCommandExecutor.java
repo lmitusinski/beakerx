@@ -72,7 +72,7 @@ public class MagicCommandExecutor {
   private static void publishOutcome(KernelFunctionality kernel, Message message, int executionCount, MagicCommandOutcomeItem item, boolean hasError) {
     if (item.getMIMEContainer().isPresent()) {
       if (item.getOutcome().equals(MagicCommandOutcomeItem.Outcome.OUTPUT)) {
-        kernel.publish(MessageCreator.buildOutputMessage(message, (String) item.getMIMEContainer().get().getData(), hasError));
+        kernel.publish(MessageCreator.buildOutputMessage(message, item.getMIMEContainer().get().getData(), hasError));
       } else {
         MIMEContainer mimeContainer = item.getMIMEContainer().get();
         kernel.publish(MessageCreator.buildMessage(message, singletonList(mimeContainer), executionCount));

@@ -83,7 +83,7 @@ public class MagicCommandResultOrderTest {
   }
 
   private String classpath(MagicCommandOutcome result) {
-    return (String) result.getItems().get(1).getMIMEContainer().get().getData();
+    return result.getItems().get(1).getMIMEContainer().get().getData();
   }
 
 }

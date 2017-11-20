@@ -37,7 +37,7 @@ public class ClasspathShowMagicCommand extends ClasspathMagicCommand {
 
   @Override
   public MagicCommandOutput execute(MagicCommandExecutionParam param) {
-    MIMEContainer result = Text(kernel.getClasspath());
-    return new MagicCommandOutput(MagicCommandOutput.Status.OK, result.getData().toString());
+    MIMEContainer result = Text(kernel.getClasspath().toString());
+    return new MagicCommandOutput(MagicCommandOutput.Status.OK, result.getData());
   }
 }

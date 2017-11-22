@@ -218,11 +218,14 @@ public class MavenJarResolver {
     }
   }
 
-  private File getOrCreateFile(String pathToMavenRepo) {
-    File theDir = new File(pathToMavenRepo);
+  private File getOrCreateFile(String path) {
+    File theDir = new File(path);
     if (!theDir.exists()) {
       try {
-        theDir.mkdir();
+        boolean theDirCreated = theDir.mkdirs();
+        if (!theDirCreated) {
+          throw new RuntimeException("Can not create directory: " + path);
+        }
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

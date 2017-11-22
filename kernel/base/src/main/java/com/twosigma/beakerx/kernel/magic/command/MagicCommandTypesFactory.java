@@ -33,6 +33,7 @@ import com.twosigma.beakerx.kernel.magic.command.functionality.TimeItLineModeMag
 import com.twosigma.beakerx.kernel.magic.command.functionality.TimeLineModeMagicCommand;
 import com.twosigma.beakerx.kernel.magic.command.functionality.UnImportMagicCommand;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,10 +106,14 @@ public class MagicCommandTypesFactory {
   }
 
   private static MagicCommandType addJarByMvn(KernelFunctionality kernel) {
+    String userDir = System.getProperty("user.home");
+    String pathToM2Repository = userDir + File.separator + ".m2" + File.separator + "repository";
     return new MagicCommandType(ClasspathAddMvnMagicCommand.CLASSPATH_ADD_MVN, "<group name version>",
-            new ClasspathAddMvnMagicCommand(new MavenJarResolver.ResolverParams(
-                    kernel.getTempFolder().toString() + "/../beakerxMvnCache",
-                    kernel.getTempFolder().toString() + MVN_DIR), kernel));
+            new ClasspathAddMvnMagicCommand(
+                    new MavenJarResolver.ResolverParams(
+                            pathToM2Repository,
+                            kernel.getTempFolder().toString() + MVN_DIR),
+                    kernel));
   }
 
   private static MagicCommandType addJar(KernelFunctionality kernel) {

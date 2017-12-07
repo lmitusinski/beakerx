@@ -22,7 +22,7 @@ public class Codev {
   private int index = 0;
 
   public Codev(String code) {
-    this.lines = code.split("\n");
+    this.lines = code.split(System.lineSeparator());
   }
 
   public CodeLine getNotBlankLine() {
@@ -45,7 +45,7 @@ public class Codev {
   }
 
   public void moveToNextLine() {
-    if ((index != -1) && index < (lines.length -1 )) {
+    if ((index != -1) && index < (lines.length - 1)) {
       index++;
     } else {
       index = -1;

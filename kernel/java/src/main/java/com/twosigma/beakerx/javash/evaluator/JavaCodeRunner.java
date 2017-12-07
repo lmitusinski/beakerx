@@ -86,7 +86,7 @@ class JavaCodeRunner implements Runnable {
     buildClasspath(compilationUnit);
     Map<Integer, Integer> lineNumbersMapping = new HashMap<>();
     LineBrakingStringBuilderWrapper javaSourceCode = new LineBrakingStringBuilderWrapper();
-    String code = ParserUtil.normalizeCode(j.codeToBeExecuted).replaceAll("\r\n", "\n");
+    String code = ParserUtil.normalizeCode(j.codeToBeExecuted);
     Codev codev = new Codev(code);
     String pname = configurePackage(codev, lineNumbersMapping, javaSourceCode);
     configureImports(codev, lineNumbersMapping, javaSourceCode);

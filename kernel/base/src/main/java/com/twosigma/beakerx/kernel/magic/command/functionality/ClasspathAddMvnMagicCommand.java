@@ -26,12 +26,9 @@ import com.twosigma.beakerx.message.Message;
 import com.twosigma.beakerx.widgets.strings.Label;
 import com.twosigma.beakerx.widgets.strings.StringWidget;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.twosigma.beakerx.kernel.magic.command.functionality.MagicCommandUtils.splitPath;
 
@@ -101,13 +98,8 @@ public class ClasspathAddMvnMagicCommand extends ClasspathMagicCommand {
 
   public class MvnLoggerWidget {
 
-    //20 jars, 100MB downloaded at 100MB/s
-
     private StringWidget widget;
     private Timer timer;
-    private volatile int jarNumbers = 0;
-    private volatile int size;
-    private volatile String speed;
     private volatile String currentLine;
 
     public MvnLoggerWidget(Message parentMessage) {
@@ -116,10 +108,8 @@ public class ClasspathAddMvnMagicCommand extends ClasspathMagicCommand {
       this.timer.scheduleAtFixedRate(new TimerTask() {
         @Override
         public void run() {
-          if (jarNumbers > 0) {
-            String status = String.format("%d jars, %dKB downloaded at %s", jarNumbers, size, speed);
-            widget.setValue(status);
-          }
+          widget.setValue(currentLine);
+
         }
       }, 0, 250);
     }
@@ -127,42 +117,6 @@ public class ClasspathAddMvnMagicCommand extends ClasspathMagicCommand {
     public void sendLog(String line) {
       if (line != null && !line.trim().isEmpty() && line.matches("Downloaded.+")) {
         this.currentLine = line;
-        if (line.matches(".+jar.+")) {
-          this.jarNumbers++;
-          String[] info = split(line);
-          if (info.length == 5) {
-            this.size += calculateJarSize(info);
-            this.speed = calculateSpeed(info);
-          }
-        }
-      }
-    }
-
-    private String calculateSpeed(String[] info) {
-      return info[3] + info[4];
-    }
-
-    private String[] split(String line) {
-      Pattern pattern = Pattern.compile("\\((.*?)\\)");
-      Matcher matcher = pattern.matcher(line);
-      if (matcher.find()) {
-        String infoWithBrackets = matcher.group();
-        return infoWithBrackets.replace("(", "").
-                replace(")", "").
-                split(" ");
-
-      }
-      return new String[0];
-    }
-
-    private int calculateJarSize(String[] info) {
-      String unit = info[1];
-      if (unit.toLowerCase().equals("kb")) {
-        return Integer.parseInt(info[0]);
-      } else if (unit.toLowerCase().equals("mb")) {
-        return new BigDecimal(info[0]).multiply(new BigDecimal("1000")).intValue();
-      } else {
-        return 0;
       }
     }
 
